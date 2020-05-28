@@ -77,6 +77,37 @@ router.post('/divisa',(req,res)=>{
         "result"  : corres
     });
 });
+router.post('/interes',(req,res)=>{
+    var datos = req.body;
+    if (datos.monto==null||datos.tipo==null||datos.tiempo==null){
+        res.status(500).json({
+            msn:"Parametros Incorrectos",
+            params
+        });
+        return;
+    }
+    var tipoInteresAnual = {
+        fijo  : 0.06, 
+        largo : 0.1  
+    }
+    if(Number(datos.tiempo) >= 12){
+        var interes = (tipoInteresAnual[datos.tipo]*Number(datos.monto))+(Number(datos.tiempo)*Number(datos.monto)*0.12)+Number(datos.monto)
+    }
+    if(Number(datos.tiempo) < 12 && Number(datos.tiempo) > 6){
+        var interes = (tipoInteresAnual[datos.tipo]*Number(datos.monto))+(Number(datos.tiempo)*Number(datos.monto)*0.06)+Number(datos.monto)
+    }
+    if(Number(datos.tiempo) < 7 && Number(datos.tiempo) > 2){
+        var interes = (tipoInteresAnual[datos.tipo]*Number(datos.monto))+(Number(datos.tiempo)*Number(datos.monto)*0.02)+Number(datos.monto)
+    }
+    if(Number(datos.tiempo) < 3 && Number(datos.tiempo) >= 0){
+        var interes = (tipoInteresAnual[datos.tipo]*Number(datos.monto))+(Number(datos.tiempo)*Number(datos.monto)*0.01)+Number(datos.monto)
+    }
+    res.status(200).json({
+        "Prestamo Pedido"       : datos.monto,
+        "Total a Pagar"         : interes,
+        "Tiempo Limite"         : datos.tiempo+" meses Puede variar si es Interes a largo plazo (MayorValorDePago)"
+    });
+});
 
 
 module.exports = router;
